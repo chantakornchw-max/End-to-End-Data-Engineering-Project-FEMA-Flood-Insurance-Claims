@@ -41,9 +41,7 @@ resources:
               - ${var.aws_access_key_id}
               - ${var.aws_secret_access_key}
               - ${var.s3_bucket_name}
-          libraries:
-            - maven:
-                coordinates: "org.postgresql:postgresql:42.6.0"
+
 
         - task_key: cleaned_bronze_to_silver
           depends_on:
@@ -56,6 +54,7 @@ resources:
               - ${var.aws_secret_access_key}
               - ${var.s3_bucket_name}
 
+
         - task_key: fact_silver_to_gold
           depends_on:
             - task_key: cleaned_bronze_to_silver
@@ -66,6 +65,7 @@ resources:
               - ${var.aws_access_key_id}
               - ${var.aws_secret_access_key}
               - ${var.s3_bucket_name}
+
 
         - task_key: create_dimension_tables
           environment_key: serverless_env 
