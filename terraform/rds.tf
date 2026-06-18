@@ -29,7 +29,7 @@ resource "aws_security_group" "rds_sg" {
 resource "aws_db_instance" "fema_postgres_db" {
   identifier             = "fema-flood-db"            # ชื่อเซิร์ฟเวอร์ที่โชว์บนหน้าเว็บ AWS
   engine                 = "postgres"                 # เลือกใช้ PostgreSQL
-  engine_version         = "15.4"                     # เวอร์ชันของฐานข้อมูล
+  engine_version         = "15.7"                     # เวอร์ชันของฐานข้อมูล
   instance_class         = "db.t3.micro"              # สเปกเครื่องจิ๋ว (อยู่ในโควตา Free Tier)
   allocated_storage      = 20                         # พื้นที่เก็บข้อมูล 20 GB (โควตา Free Tier)
   
