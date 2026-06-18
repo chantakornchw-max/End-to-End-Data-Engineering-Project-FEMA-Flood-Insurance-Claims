@@ -4,7 +4,6 @@
 bundle:
   name: fema_pipeline
 
-
 variables:
   aws_access_key_id:
     description: "AWS Access Key"
@@ -12,7 +11,6 @@ variables:
     description: "AWS Secret Key"
   s3_bucket_name:
     description: "S3 Bucket Name"
-
 
 workspace:
   root_path: /Workspace/Shared/FEMA_Project/.bundle
@@ -28,50 +26,159 @@ resources:
     fema_pipeline:
       name: "FEMA End-to-End Data Pipeline (Medallion Architecture)"
       schedule:
-        quartz_cron_expression: "0 0 14 * * ?" 
+        quartz_cron_expression: "0 0 15 * * ?" 
         timezone_id: "Asia/Bangkok"
       
-
-      job_clusters:
-        - job_cluster_key: shared_pipeline_cluster
-          new_cluster:
-            spark_version: "13.3.x-scala2.12"
-            node_type_id: "i3.xlarge" 
-            num_workers: 1
-
-            spark_env_vars:
-              AWS_ACCESS_KEY_ID: ${var.aws_access_key_id}
-              AWS_SECRET_ACCESS_KEY: ${var.aws_secret_access_key}
-              S3_BUCKET_NAME: ${var.s3_bucket_name}
-
-      # 4. เรียงลำดับงาน (Task Orchestration)
       tasks:
         - task_key: ingest_from_rds_to_s3
-          job_cluster_key: shared_pipeline_cluster
           spark_python_task:
             python_file: "scripts/ingest_from_rds_to_s3.py"
+            parameters:
+              - ${var.aws_access_key_id}
+              - ${var.aws_secret_access_key}
+              - ${var.s3_bucket_name}
           libraries:
             - maven:
                 coordinates: "org.postgresql:postgresql:42.6.0"
 
-
         - task_key: cleaned_bronze_to_silver
           depends_on:
             - task_key: ingest_from_rds_to_s3
-          job_cluster_key: shared_pipeline_cluster
           spark_python_task:
             python_file: "scripts/cleaned_bronze_to_silver.py"
-
+            parameters: 
+              - ${var.aws_access_key_id}
+              - ${var.aws_secret_access_key}
+              - ${var.s3_bucket_name}
 
         - task_key: fact_silver_to_gold
           depends_on:
             - task_key: cleaned_bronze_to_silver
-          job_cluster_key: shared_pipeline_cluster
           spark_python_task:
             python_file: "scripts/fact_silver_to_gold.py"
-
+            parameters: 
+              - ${var.aws_access_key_id}
+              - ${var.aws_secret_access_key}
+              - ${var.s3_bucket_name}
 
         - task_key: create_dimension_tables
-          job_cluster_key: shared_pipeline_cluster
           spark_python_task:
             python_file: "scripts/create_dimension_tables.py"
+            parameters: 
+              - ${var.aws_access_key_id}
+              - ${var.aws_secret_access_key}
+              - ${var.s3_bucket_name}
+
+
+
+# # ==========================================
+# # Databricks Asset Bundle Configuration
+# # ==========================================
+# bundle:
+#   name: fema_pipeline
+
+
+# variables:
+#   aws_access_key_id:
+#     description: "AWS Access Key"
+#   aws_secret_access_key:
+#     description: "AWS Secret Key"
+#   s3_bucket_name:
+#     description: "S3 Bucket Name"
+
+
+# workspace:
+#   root_path: /Workspace/Shared/FEMA_Project/.bundle
+
+# environments:
+#   production:
+#     mode: production
+#     workspace:
+#       root_path: /Workspace/Users/s6401091631081@email.kmutnb.ac.th/.bundle/${bundle.name}/${bundle.target}
+
+# resources:
+#   jobs:
+#     fema_pipeline:
+#       name: "FEMA End-to-End Data Pipeline (Medallion Architecture)"
+#       schedule:
+#         quartz_cron_expression: "0 0 15 * * ?" 
+#         timezone_id: "Asia/Bangkok"
+      
+#       tasks:
+#         - task_key: ingest_from_rds_to_s3
+#           spark_python_task:
+#             python_file: "scripts/ingest_from_rds_to_s3.py"
+#             parameters:
+#               - ${var.aws_access_key_id}
+#               - ${var.aws_secret_access_key}
+#               - ${var.s3_bucket_name}
+#           libraries:
+#             - maven:
+#                 coordinates: "org.postgresql:postgresql:42.6.0"
+
+
+#         - task_key: cleaned_bronze_to_silver
+#           depends_on:
+#             - task_key: ingest_from_rds_to_s3
+#           spark_python_task:
+#             python_file: "scripts/cleaned_bronze_to_silver.py"
+
+
+#         - task_key: fact_silver_to_gold
+#           depends_on:
+#             - task_key: cleaned_bronze_to_silver
+#           spark_python_task:
+#             python_file: "scripts/fact_silver_to_gold.py"
+
+
+#         - task_key: create_dimension_tables
+#           spark_python_task:
+#             python_file: "scripts/create_dimension_tables.py"
+
+
+
+
+
+      # job_clusters:
+      #   - job_cluster_key: shared_pipeline_cluster
+      #     new_cluster:
+      #       spark_version: "13.3.x-scala2.12"
+      #       node_type_id: "i3.xlarge" 
+      #       num_workers: 1
+
+      #       spark_env_vars:
+      #         AWS_ACCESS_KEY_ID: ${var.aws_access_key_id}
+      #         AWS_SECRET_ACCESS_KEY: ${var.aws_secret_access_key}
+      #         S3_BUCKET_NAME: ${var.s3_bucket_name}
+
+      # # 4. เรียงลำดับงาน (Task Orchestration)
+      # tasks:
+      #   - task_key: ingest_from_rds_to_s3
+      #     job_cluster_key: shared_pipeline_cluster
+      #     spark_python_task:
+      #       python_file: "scripts/ingest_from_rds_to_s3.py"
+      #     libraries:
+      #       - maven:
+      #           coordinates: "org.postgresql:postgresql:42.6.0"
+
+
+      #   - task_key: cleaned_bronze_to_silver
+      #     depends_on:
+      #       - task_key: ingest_from_rds_to_s3
+      #     job_cluster_key: shared_pipeline_cluster
+      #     spark_python_task:
+      #       python_file: "scripts/cleaned_bronze_to_silver.py"
+
+
+      #   - task_key: fact_silver_to_gold
+      #     depends_on:
+      #       - task_key: cleaned_bronze_to_silver
+      #     job_cluster_key: shared_pipeline_cluster
+      #     spark_python_task:
+      #       python_file: "scripts/fact_silver_to_gold.py"
+
+
+      #   - task_key: create_dimension_tables
+      #     job_cluster_key: shared_pipeline_cluster
+      #     spark_python_task:
+      #       python_file: "scripts/create_dimension_tables.py"

@@ -1,4 +1,4 @@
-import os
+import sys
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StructField, IntegerType, StringType
 import logging
@@ -15,15 +15,24 @@ def create_dimension_tables():
         .getOrCreate()
     )
 
-    aws_access_key = os.environ.get("AWS_ACCESS_KEY_ID")
-    aws_secret_key = os.environ.get("AWS_SECRET_ACCESS_KEY")
+    aws_access_key = sys.argv[1]
+    aws_secret_key = sys.argv[2]
     spark.conf.set("fs.s3a.access.key", aws_access_key)
     spark.conf.set("fs.s3a.secret.key", aws_secret_key)
     spark.conf.set("fs.s3a.endpoint", "s3.ap-southeast-1.amazonaws.com")
 
-
-    bucket_name = os.environ.get("S3_BUCKET_NAME", "fema-flood-claims-bucket-2026")
+    bucket_name = sys.argv[3]
     gold_output_path = f"s3a://{bucket_name}/gold/dimensions"
+
+    # aws_access_key = os.environ.get("AWS_ACCESS_KEY_ID")
+    # aws_secret_key = os.environ.get("AWS_SECRET_ACCESS_KEY")
+    # spark.conf.set("fs.s3a.access.key", aws_access_key)
+    # spark.conf.set("fs.s3a.secret.key", aws_secret_key)
+    # spark.conf.set("fs.s3a.endpoint", "s3.ap-southeast-1.amazonaws.com")
+
+
+    # bucket_name = os.environ.get("S3_BUCKET_NAME", "fema-flood-claims-bucket-2026")
+    # gold_output_path = f"s3a://{bucket_name}/gold/dimensions"
 
 
     try:

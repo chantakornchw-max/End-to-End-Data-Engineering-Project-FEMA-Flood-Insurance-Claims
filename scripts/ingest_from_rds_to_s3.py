@@ -1,13 +1,11 @@
-import os
+import sys  
 import boto3
 import json
 import logging
 from pyspark.sql import SparkSession
 
-def get_db_credentials(secret_name, region_name="ap-southeast-1"):
-    # ดึงค่า AWS Keys จาก Environment Variables ที่ Databricks ส่งมาให้
-    aws_access_key = os.environ.get("AWS_ACCESS_KEY_ID")
-    aws_secret_key = os.environ.get("AWS_SECRET_ACCESS_KEY")
+
+def get_db_credentials(secret_name, aws_access_key, aws_secret_key, region_name="ap-southeast-1"):
 
     client = boto3.client(
         service_name='secretsmanager',
@@ -25,6 +23,7 @@ def get_db_credentials(secret_name, region_name="ap-southeast-1"):
         logging.error(f"Failed to retrieve password from Secrets Manager!: {e}")
         raise e
 
+
 def ingest_from_rds_to_s3():
 
     logging.basicConfig(
@@ -37,21 +36,19 @@ def ingest_from_rds_to_s3():
         .getOrCreate()
     )
 
-
-    aws_access_key = os.environ.get("AWS_ACCESS_KEY_ID")
-    aws_secret_key = os.environ.get("AWS_SECRET_ACCESS_KEY")
+    aws_access_key = sys.argv[1]
+    aws_secret_key = sys.argv[2]
     spark.conf.set("fs.s3a.access.key", aws_access_key)
     spark.conf.set("fs.s3a.secret.key", aws_secret_key)
     spark.conf.set("fs.s3a.endpoint", "s3.ap-southeast-1.amazonaws.com") 
 
     table_name = "public.raw_fema_claims"
-
-    bucket_name = os.environ.get("S3_BUCKET_NAME", "fema-flood-claims-bucket-2026")
+    bucket_name = sys.argv[3]
     bronze_output_path = f"s3a://{bucket_name}/bronze/raw_data/"
 
     try:
 
-        db_creds = get_db_credentials(secret_name='fema/rds_credentials')
+        db_creds = get_db_credentials('fema/rds_credentials', aws_access_key, aws_secret_key)
     
         rds_endpoint = db_creds['host']
         db_user = db_creds['username']
@@ -95,5 +92,3 @@ def ingest_from_rds_to_s3():
 
 if __name__ == "__main__":
     ingest_from_rds_to_s3()
-
-
