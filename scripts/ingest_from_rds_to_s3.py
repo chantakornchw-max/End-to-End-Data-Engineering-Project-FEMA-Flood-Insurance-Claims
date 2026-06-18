@@ -58,12 +58,17 @@ def ingest_from_rds_to_s3():
 
         db_creds = get_db_credentials('fema/rds_credentials', aws_access_key, aws_secret_key)
 
-        logging.info(f"==== SECRET KEYS WE GOT: {db_creds.keys()} ====")
-        logging.info(f"==== SECRET CONTENT TYPE: {type(db_creds)} ====")
+
+        rds_endpoint = next(v for k, v in db_creds.items() if 'host' in k)
+        db_user = next(v for k, v in db_creds.items() if 'user' in k)
+        db_password = next(v for k, v in db_creds.items() if 'pass' in k)
+
+        # logging.info(f"==== SECRET KEYS WE GOT: {db_creds.keys()} ====")
+        # logging.info(f"==== SECRET CONTENT TYPE: {type(db_creds)} ====")
     
-        rds_endpoint = db_creds['host']
-        db_user = db_creds['username']
-        db_password = db_creds['password']
+        # rds_endpoint = db_creds['host']
+        # db_user = db_creds['username']
+        # db_password = db_creds['password']
         
         jdbc_url = f"jdbc:postgresql://{rds_endpoint}:5432/fema_flood_db"
         connection_properties = {
