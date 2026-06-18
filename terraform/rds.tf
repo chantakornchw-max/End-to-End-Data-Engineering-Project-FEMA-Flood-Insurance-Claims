@@ -27,7 +27,7 @@ resource "aws_security_group" "rds_sg" {
 # PostgreSQL Configurations
 # ==========================================
 resource "aws_db_instance" "fema_postgres_db" {
-  identifier             = "fema_flood_db"            # ชื่อเซิร์ฟเวอร์ที่โชว์บนหน้าเว็บ AWS
+  identifier             = "fema-flood-db"            # ชื่อเซิร์ฟเวอร์ที่โชว์บนหน้าเว็บ AWS
   engine                 = "postgres"                 # เลือกใช้ PostgreSQL
   engine_version         = "15.4"                     # เวอร์ชันของฐานข้อมูล
   instance_class         = "db.t3.micro"              # สเปกเครื่องจิ๋ว (อยู่ในโควตา Free Tier)
