@@ -2,12 +2,18 @@
 # Required Providers
 # ==========================================
 terraform {
-  required_version = ">= 1.0" # บังคับเวอร์ชันของระบบ Terraform หลัก
+  required_version = ">= 1.0" 
+
+  backend "s3" {
+    bucket = "fema-terraform-state-2026"   
+    key    = "prod/terraform.tfstate"      
+    region = "ap-southeast-1"
+  }
 
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.0" # ใช้ปลั๊กอิน AWS เวอร์ชัน 5.x 
+      version = "~> 5.0" 
     }
   }
 }

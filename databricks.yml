@@ -4,7 +4,7 @@
 bundle:
   name: fema_pipeline
 
-# 1. รับค่าตัวแปร (Variables) ที่จะถูกส่งมาจาก GitHub Actions
+
 variables:
   aws_access_key_id:
     description: "AWS Access Key"
@@ -13,13 +13,15 @@ variables:
   s3_bucket_name:
     description: "S3 Bucket Name"
 
-# 2. กำหนดที่ตั้งในตึก Databricks
+
 workspace:
   root_path: /Workspace/Shared/FEMA_Project/.bundle
 
 environments:
   production:
     mode: production
+    workspace:
+      root_path: /Workspace/Users/s6401091631081@email.kmutnb.ac.th/.bundle/${bundle.name}/${bundle.target}
 
 resources:
   jobs:
@@ -29,14 +31,14 @@ resources:
         quartz_cron_expression: "0 0 14 * * ?" 
         timezone_id: "Asia/Bangkok"
       
-      # 3. สร้าง Cluster เครื่องเดียว แล้วให้ทุก Task ใช้ร่วมกัน (ประหยัดเงินมหาศาล!)
+
       job_clusters:
         - job_cluster_key: shared_pipeline_cluster
           new_cluster:
             spark_version: "13.3.x-scala2.12"
-            node_type_id: "i3.xlarge" # สเปกมาตรฐาน AWS Databricks
+            node_type_id: "i3.xlarge" 
             num_workers: 1
-            # เอาตัวแปรจากข้อ 1 มายัดเป็น Environment Variables ให้โค้ด Python เรียกใช้
+
             spark_env_vars:
               AWS_ACCESS_KEY_ID: ${var.aws_access_key_id}
               AWS_SECRET_ACCESS_KEY: ${var.aws_secret_access_key}
