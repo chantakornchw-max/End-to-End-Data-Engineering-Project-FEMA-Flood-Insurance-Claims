@@ -20,9 +20,9 @@ def cleaned_bronze_to_silver():
 
     aws_access_key = sys.argv[1]
     aws_secret_key = sys.argv[2]
-    spark.conf.set("fs.s3a.access.key", aws_access_key)
-    spark.conf.set("fs.s3a.secret.key", aws_secret_key)
-    spark.conf.set("fs.s3a.endpoint", "s3.ap-southeast-1.amazonaws.com")
+    spark.conf.set("spark.hadoop.fs.s3a.access.key", aws_access_key)
+    spark.conf.set("spark.hadoop.fs.s3a.secret.key", aws_secret_key)
+    spark.conf.set("spark.hadoop.fs.s3a.endpoint", "s3.ap-southeast-1.amazonaws.com")
 
     bucket_name = sys.argv[3]
     bronze_input_path = f"s3a://{bucket_name}/bronze/raw_data/"
