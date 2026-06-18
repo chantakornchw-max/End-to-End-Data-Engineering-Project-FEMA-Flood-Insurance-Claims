@@ -1,0 +1,75 @@
+# ==========================================
+# Databricks Asset Bundle Configuration
+# ==========================================
+bundle:
+  name: fema_pipeline
+
+# 1. รับค่าตัวแปร (Variables) ที่จะถูกส่งมาจาก GitHub Actions
+variables:
+  aws_access_key_id:
+    description: "AWS Access Key"
+  aws_secret_access_key:
+    description: "AWS Secret Key"
+  s3_bucket_name:
+    description: "S3 Bucket Name"
+
+# 2. กำหนดที่ตั้งในตึก Databricks
+workspace:
+  root_path: /Workspace/Shared/FEMA_Project/.bundle
+
+environments:
+  production:
+    mode: production
+
+resources:
+  jobs:
+    fema_pipeline:
+      name: "FEMA End-to-End Data Pipeline (Medallion Architecture)"
+      schedule:
+        quartz_cron_expression: "0 0 14 * * ?" 
+        timezone_id: "Asia/Bangkok"
+      
+      # 3. สร้าง Cluster เครื่องเดียว แล้วให้ทุก Task ใช้ร่วมกัน (ประหยัดเงินมหาศาล!)
+      job_clusters:
+        - job_cluster_key: shared_pipeline_cluster
+          new_cluster:
+            spark_version: "13.3.x-scala2.12"
+            node_type_id: "i3.xlarge" # สเปกมาตรฐาน AWS Databricks
+            num_workers: 1
+            # เอาตัวแปรจากข้อ 1 มายัดเป็น Environment Variables ให้โค้ด Python เรียกใช้
+            spark_env_vars:
+              AWS_ACCESS_KEY_ID: ${var.aws_access_key_id}
+              AWS_SECRET_ACCESS_KEY: ${var.aws_secret_access_key}
+              S3_BUCKET_NAME: ${var.s3_bucket_name}
+
+      # 4. เรียงลำดับงาน (Task Orchestration)
+      tasks:
+        - task_key: ingest_from_rds_to_s3
+          job_cluster_key: shared_pipeline_cluster
+          spark_python_task:
+            python_file: "scripts/ingest_from_rds_to_s3.py"
+          libraries:
+            - maven:
+                coordinates: "org.postgresql:postgresql:42.6.0"
+
+
+        - task_key: cleaned_bronze_to_silver
+          depends_on:
+            - task_key: ingest_from_rds_to_s3
+          job_cluster_key: shared_pipeline_cluster
+          spark_python_task:
+            python_file: "scripts/cleaned_bronze_to_silver.py"
+
+
+        - task_key: fact_silver_to_gold
+          depends_on:
+            - task_key: cleaned_bronze_to_silver
+          job_cluster_key: shared_pipeline_cluster
+          spark_python_task:
+            python_file: "scripts/fact_silver_to_gold.py"
+
+
+        - task_key: create_dimension_tables
+          job_cluster_key: shared_pipeline_cluster
+          spark_python_task:
+            python_file: "scripts/create_dimension_tables.py"

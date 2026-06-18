@@ -1,0 +1,23 @@
+.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfvars
+
+
+# ไฟล์รัน Terraform ห้ามเอาขึ้นเด็ดขาด
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+
+# ไฟล์ Data ห้ามเอาขึ้น
+*.csv
+migrate_csv_to_rds.py
+
+
+# ไฟล์ขยะของ Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+.env

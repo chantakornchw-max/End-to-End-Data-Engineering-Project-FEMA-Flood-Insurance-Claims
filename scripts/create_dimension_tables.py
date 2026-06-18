@@ -1,0 +1,208 @@
+import os
+from pyspark.sql import SparkSession
+from pyspark.sql.types import StructType, StructField, IntegerType, StringType
+import logging
+
+def create_dimension_tables():
+
+    logging.basicConfig(
+        level=logging.INFO, 
+        format='%(asctime)s - %(levelname)s - %(message)s'
+    )
+
+    spark = (SparkSession.builder
+        .appName("create_dimension_tables")
+        .getOrCreate()
+    )
+
+    aws_access_key = os.environ.get("AWS_ACCESS_KEY_ID")
+    aws_secret_key = os.environ.get("AWS_SECRET_ACCESS_KEY")
+    spark.conf.set("fs.s3a.access.key", aws_access_key)
+    spark.conf.set("fs.s3a.secret.key", aws_secret_key)
+    spark.conf.set("fs.s3a.endpoint", "s3.ap-southeast-1.amazonaws.com")
+
+
+    bucket_name = os.environ.get("S3_BUCKET_NAME", "fema-flood-claims-bucket-2026")
+    gold_output_path = f"s3a://{bucket_name}/gold/dimensions"
+
+
+    try:
+        logging.info("Starting create Dimension Tables...")
+
+        # ==========================================
+        # Dimension 1: dim_occupancy
+        # ==========================================
+        occupancy_data = [
+            (1, "Single Family Residence"),
+            (2, "2 to 4 Unit Residential Building"),
+            (3, "Residential Building with > 4 Units"),
+            (4, "Non-Residential Building"),
+            (6, "Non-Residential - Business"),
+            (11, "Single Family Residential (Excl. Mobile Home)"),
+            (12, "Residential Non-Condo (2-4 Units)"),
+            (13, "Residential Non-Condo (5+ Units)"),
+            (14, "Residential Mobile/Manufactured Home"),
+            (15, "Residential Condo Association"),
+            (16, "Single Residential Unit within Multi-Unit Building"),
+            (17, "Non-Residential Mobile/Manufactured Home"),
+            (18, "Non-Residential Building (General)"),
+            (19, "Non-Residential Unit within Multi-Unit Building")
+        ]
+
+        occupancy_schema = StructType([
+            StructField("occupancy_type", IntegerType(), False),
+            StructField("occupancy_type_description", StringType(), False)
+        ])
+        
+        dim_occupancy_df = spark.createDataFrame(occupancy_data, occupancy_schema)
+
+        (dim_occupancy_df
+                .coalesce(1)
+                .write
+                .format("delta") 
+                .mode("overwrite")
+                .option("path", f"{gold_output_path}/dim_occupancy/")
+                .saveAsTable("default.gold_dim_occupancy") 
+        )
+        logging.info("Created and registered default.gold_dim_occupancy successfully")
+
+
+        # ==========================================
+        # Dimension 2: dim_primary_residence
+        # ==========================================
+        primary_residence_data = [
+            (1, "Yes (Primary Residence)"),
+            (0, "No (Not a Primary Residence)")
+        ]
+
+        primary_residence_schema = StructType([
+            StructField("primary_residence_indicator", IntegerType(), False),
+            StructField("primary_residence_description", StringType(), False)
+        ])
+
+        dim_primary_residence_df = spark.createDataFrame(primary_residence_data, primary_residence_schema)
+
+        (dim_primary_residence_df
+                .coalesce(1)
+                .write
+                .format("delta")
+                .mode("overwrite")
+                .option("path", f"{gold_output_path}/dim_primary_residence/")
+                .saveAsTable("default.gold_dim_primary_residence")
+        )
+        logging.info("Created and registered default.gold_dim_primary_residence successfully")
+
+
+        # ==========================================
+        # Dimension 3: dim_building_deductible
+        # ==========================================
+        deductible_data = [
+            ("0", "$500"), ("1", "$1,000"), ("2", "$2,000"), 
+            ("3", "$3,000"), ("4", "$4,000"), ("5", "$5,000"), 
+            ("9", "$750"), ("A", "$10,000"), ("B", "$15,000"), 
+            ("C", "$20,000"), ("D", "$25,000"), ("E", "$50,000"), 
+            ("F", "$1,250"), ("G", "$1,500"), ("H", "$200 (Group Policies Only)")
+        ]
+
+        deductible_schema = StructType([
+            StructField("building_deductible_code", StringType(), False),
+            StructField("building_deductible_description", StringType(), False)
+        ])
+
+        dim_deductible_df = spark.createDataFrame(deductible_data, deductible_schema)
+
+        (dim_deductible_df
+                .coalesce(1)
+                .write
+                .format("delta")
+                .mode("overwrite")
+                .option("path", f"{gold_output_path}/dim_building_deductible/")
+                .saveAsTable("default.gold_dim_building_deductible")
+        )
+        logging.info("Created and registered default.gold_dim_building_deductible successfully")
+
+
+        # ==========================================
+        # Dimension 4: dim_cause_of_damage
+        # ==========================================
+        cause_data = [
+            ("0", "Other causes"), 
+            ("1", "Tidal water overflow"), 
+            ("2", "Stream, river, or lake overflow"), 
+            ("3", "Alluvial fan overflow"), 
+            ("4", "Accumulation of rainfall or snowmelt"), 
+            ("7", "Erosion-demolition"), 
+            ("8", "Erosion-removal"), 
+            ("9", "Earth movement, landslide, subsidence"), 
+            ("A", "Closed basin lake"), 
+            ("B", "Expedited (No site inspection)"), 
+            ("C", "Expedited (Follow-up site inspection)"), 
+            ("D", "Expedited (Remote Adjustment)")
+        ]
+
+        cause_schema = StructType([
+            StructField("cause_of_damage", StringType(), False),
+            StructField("cause_of_damage_description", StringType(), False)
+        ])
+
+        dim_cause_df = spark.createDataFrame(cause_data, cause_schema)
+
+        (dim_cause_df
+            .coalesce(1)
+            .write
+            .format("delta")
+            .mode("overwrite")
+            .option("path", f"{gold_output_path}/dim_cause_of_damage/")
+            .saveAsTable("default.gold_dim_cause_of_damage")
+        )
+        logging.info("Created and registered default.gold_dim_cause_of_damage successfully")
+
+
+        # ==========================================
+        # Dimension 5: dim_non_payment_reason
+        # ==========================================
+        non_payment_data = [
+            ("01", "Claim denied (less than deductible)"), ("02", "Seepage"), 
+            ("03", "Backup drains"), ("04", "Shrubs not covered"), 
+            ("05", "Sea wall"), ("06", "Not actual flood"), 
+            ("07", "Loss in progress"), ("08", "Failure to pursue claim"), 
+            ("09", "Debris removal only"), ("10", "Fire"), 
+            ("11", "Fence damage"), ("12", "Hydrostatic pressure"), 
+            ("13", "Drainage clogged"), ("14", "Boat piers"), 
+            ("15", "Not insured (damage before policy)"), ("16", "Not insured (wind damage)"), 
+            ("17", "Erosion type not in flood definition"), ("18", "Landslide"), 
+            ("19", "Mudflow type not in flood definition"), ("20", "No demonstrable damage"), 
+            ("97", "Other"), ("98", "Error-delete claim"), 
+            ("99", "Erroneous assignment"),
+            ("Not Applicable", "Paid or N/A") 
+        ]
+
+        non_payment_schema = StructType([
+            StructField("non_payment_reason_building", StringType(), False),
+            StructField("non_payment_reason_description", StringType(), False)
+        ])
+
+        dim_non_payment_df = spark.createDataFrame(non_payment_data, non_payment_schema)
+
+        (dim_non_payment_df
+                .coalesce(1)
+                .write
+                .format("delta")
+                .mode("overwrite")
+                .option("path", f"{gold_output_path}/dim_non_payment_reason/")
+                .saveAsTable("default.gold_dim_non_payment_reason")
+        )
+        logging.info("Created and registered default.gold_dim_non_payment_reason successfully")
+
+
+    except Exception as e:
+        logging.error(f"Unexpected error occurred!: {e}")
+        raise e
+
+
+    finally:
+        spark.stop()
+        logging.info("Spark session stopped.")
+
+if __name__ == "__main__":
+    create_dimension_tables()
