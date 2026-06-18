@@ -57,6 +57,9 @@ def ingest_from_rds_to_s3():
     try:
 
         db_creds = get_db_credentials('fema/rds_credentials', aws_access_key, aws_secret_key)
+
+        logging.info(f"==== SECRET KEYS WE GOT: {db_creds.keys()} ====")
+        logging.info(f"==== SECRET CONTENT TYPE: {type(db_creds)} ====")
     
         rds_endpoint = db_creds['host']
         db_user = db_creds['username']
