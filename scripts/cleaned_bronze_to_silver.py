@@ -18,8 +18,8 @@ def cleaned_bronze_to_silver():
         .getOrCreate()
     )
 
-    aws_access_key = sys.argv[1]
-    aws_secret_key = sys.argv[2]
+    # aws_access_key = sys.argv[1]
+    # aws_secret_key = sys.argv[2]
     # spark.sparkContext._jsc.hadoopConfiguration().set("fs.s3a.access.key", aws_access_key)
     # spark.sparkContext._jsc.hadoopConfiguration().set("fs.s3a.secret.key", aws_secret_key)
     # spark.sparkContext._jsc.hadoopConfiguration().set("fs.s3a.endpoint", "s3.ap-southeast-1.amazonaws.com")
