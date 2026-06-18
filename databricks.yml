@@ -31,6 +31,10 @@ resources:
         - environment_key: serverless_env
           spec:
             client: "1"
+          spark_conf:                                                       
+          spark.hadoop.fs.s3a.access.key: ${var.aws_access_key_id}         
+          spark.hadoop.fs.s3a.secret.key: ${var.aws_secret_access_key}     
+          spark.hadoop.fs.s3a.endpoint: "s3.ap-southeast-1.amazonaws.com"  
 
       tasks:
         - task_key: ingest_from_rds_to_s3
