@@ -22,7 +22,7 @@ def create_dimension_tables():
     # spark.sparkContext._jsc.hadoopConfiguration().set("fs.s3a.endpoint", "s3.ap-southeast-1.amazonaws.com")
 
     bucket_name = sys.argv[3]
-    gold_output_path = f"s3a://{bucket_name}/gold/dimensions"
+    gold_output_path = f"s3://{bucket_name}/gold/dimensions"
 
     # aws_access_key = os.environ.get("AWS_ACCESS_KEY_ID")
     # aws_secret_key = os.environ.get("AWS_SECRET_ACCESS_KEY")

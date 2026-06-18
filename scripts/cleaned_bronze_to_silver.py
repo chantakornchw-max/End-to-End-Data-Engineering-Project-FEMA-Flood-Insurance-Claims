@@ -25,8 +25,8 @@ def cleaned_bronze_to_silver():
     # spark.sparkContext._jsc.hadoopConfiguration().set("fs.s3a.endpoint", "s3.ap-southeast-1.amazonaws.com")
 
     bucket_name = sys.argv[3]
-    bronze_input_path = f"s3a://{bucket_name}/bronze/raw_data/"
-    silver_output_path = f"s3a://{bucket_name}/silver/cleaned_data/fact/" 
+    bronze_input_path = f"s3://{bucket_name}/bronze/raw_data/"
+    silver_output_path = f"s3://{bucket_name}/silver/cleaned_data/fact/" 
 
 
     # aws_access_key = os.environ.get("AWS_ACCESS_KEY_ID")

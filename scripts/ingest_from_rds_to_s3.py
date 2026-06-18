@@ -52,7 +52,7 @@ def ingest_from_rds_to_s3():
 
     table_name = "public.raw_fema_claims"
     bucket_name = sys.argv[3]
-    bronze_output_path = f"s3a://{bucket_name}/bronze/raw_data/"
+    bronze_output_path = f"s3://{bucket_name}/bronze/raw_data/"
 
     try:
 

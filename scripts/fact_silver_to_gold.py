@@ -21,8 +21,8 @@ def fact_silver_to_gold():
     # spark.sparkContext._jsc.hadoopConfiguration().set("fs.s3a.endpoint", "s3.ap-southeast-1.amazonaws.com")
 
     bucket_name = sys.argv[3]
-    silver_input_path = f"s3a://{bucket_name}/silver/cleaned_data/fact/"
-    gold_output_path = f"s3a://{bucket_name}/gold/fact/"
+    silver_input_path = f"s3://{bucket_name}/silver/cleaned_data/fact/"
+    gold_output_path = f"s3://{bucket_name}/gold/fact/"
 
     # aws_access_key = os.environ.get("AWS_ACCESS_KEY_ID")
     # aws_secret_key = os.environ.get("AWS_SECRET_ACCESS_KEY")
