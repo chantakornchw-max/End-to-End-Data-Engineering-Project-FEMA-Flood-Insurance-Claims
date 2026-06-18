@@ -25,20 +25,23 @@ resources:
       schedule:
         quartz_cron_expression: "0 0 22 * * ?" 
         timezone_id: "Asia/Bangkok"
-      
 
-      environments:
-        - environment_key: serverless_env
-          spec:
-            client: "1"
-          spark_conf:                                                       
-          spark.hadoop.fs.s3a.access.key: ${var.aws_access_key_id}         
-          spark.hadoop.fs.s3a.secret.key: ${var.aws_secret_access_key}     
-          spark.hadoop.fs.s3a.endpoint: "s3.ap-southeast-1.amazonaws.com"  
+      job_clusters:
+        - job_cluster_key: standard_cluster
+          new_cluster:
+            spark_version: "14.3.x-scala2.12"
+            node_type_id: "m5.xlarge"
+            num_workers: 1
+            spark_conf:                                                       
+              spark.hadoop.fs.s3a.access.key: ${var.aws_access_key_id}        
+              spark.hadoop.fs.s3a.secret.key: ${var.aws_secret_access_key}    
+              spark.hadoop.fs.s3a.endpoint: "s3.ap-southeast-1.amazonaws.com"
+            spark_env_vars:
+              AWS_REGION: "ap-southeast-1"
 
       tasks:
         - task_key: ingest_from_rds_to_s3
-          environment_key: serverless_env 
+          job_cluster_key: standard_cluster 
           spark_python_task:
             python_file: "scripts/ingest_from_rds_to_s3.py"
             parameters:
@@ -46,11 +49,10 @@ resources:
               - ${var.aws_secret_access_key}
               - ${var.s3_bucket_name}
 
-
         - task_key: cleaned_bronze_to_silver
           depends_on:
             - task_key: ingest_from_rds_to_s3
-          environment_key: serverless_env 
+          job_cluster_key: standard_cluster 
           spark_python_task:
             python_file: "scripts/cleaned_bronze_to_silver.py"
             parameters:
@@ -58,11 +60,10 @@ resources:
               - ${var.aws_secret_access_key}
               - ${var.s3_bucket_name}
 
-
         - task_key: fact_silver_to_gold
           depends_on:
             - task_key: cleaned_bronze_to_silver
-          environment_key: serverless_env 
+          job_cluster_key: standard_cluster 
           spark_python_task:
             python_file: "scripts/fact_silver_to_gold.py"
             parameters:
@@ -70,15 +71,99 @@ resources:
               - ${var.aws_secret_access_key}
               - ${var.s3_bucket_name}
 
-
         - task_key: create_dimension_tables
-          environment_key: serverless_env 
+          job_cluster_key: standard_cluster 
           spark_python_task:
             python_file: "scripts/create_dimension_tables.py"
             parameters:
               - ${var.aws_access_key_id}
               - ${var.aws_secret_access_key}
               - ${var.s3_bucket_name}
+
+
+
+
+# bundle:
+#   name: fema_pipeline
+
+# variables:
+#   aws_access_key_id:
+#     description: "AWS Access Key"
+#   aws_secret_access_key:
+#     description: "AWS Secret Key"
+#   s3_bucket_name:
+#     description: "S3 Bucket Name"
+
+# workspace:
+#   root_path: /Workspace/Shared/FEMA_Project/.bundle
+
+# environments:
+#   production:
+#     mode: production
+#     workspace:
+#       root_path: /Workspace/Users/s6401091631081@email.kmutnb.ac.th/.bundle/${bundle.name}/${bundle.target}
+
+# resources:
+#   jobs:
+#     fema_pipeline:
+#       name: "FEMA End-to-End Data Pipeline (Medallion Architecture)"
+#       schedule:
+#         quartz_cron_expression: "0 0 22 * * ?" 
+#         timezone_id: "Asia/Bangkok"
+      
+
+#       environments:
+#         - environment_key: serverless_env
+#           spec:
+#             client: "1"
+#           spark_conf:                                                       
+#           spark.hadoop.fs.s3a.access.key: ${var.aws_access_key_id}         
+#           spark.hadoop.fs.s3a.secret.key: ${var.aws_secret_access_key}     
+#           spark.hadoop.fs.s3a.endpoint: "s3.ap-southeast-1.amazonaws.com"  
+
+#       tasks:
+#         - task_key: ingest_from_rds_to_s3
+#           environment_key: serverless_env 
+#           spark_python_task:
+#             python_file: "scripts/ingest_from_rds_to_s3.py"
+#             parameters:
+#               - ${var.aws_access_key_id}
+#               - ${var.aws_secret_access_key}
+#               - ${var.s3_bucket_name}
+
+
+#         - task_key: cleaned_bronze_to_silver
+#           depends_on:
+#             - task_key: ingest_from_rds_to_s3
+#           environment_key: serverless_env 
+#           spark_python_task:
+#             python_file: "scripts/cleaned_bronze_to_silver.py"
+#             parameters:
+#               - ${var.aws_access_key_id}
+#               - ${var.aws_secret_access_key}
+#               - ${var.s3_bucket_name}
+
+
+#         - task_key: fact_silver_to_gold
+#           depends_on:
+#             - task_key: cleaned_bronze_to_silver
+#           environment_key: serverless_env 
+#           spark_python_task:
+#             python_file: "scripts/fact_silver_to_gold.py"
+#             parameters:
+#               - ${var.aws_access_key_id}
+#               - ${var.aws_secret_access_key}
+#               - ${var.s3_bucket_name}
+
+
+#         - task_key: create_dimension_tables
+#           environment_key: serverless_env 
+#           spark_python_task:
+#             python_file: "scripts/create_dimension_tables.py"
+#             parameters:
+#               - ${var.aws_access_key_id}
+#               - ${var.aws_secret_access_key}
+#               - ${var.s3_bucket_name}
 
       # tasks:
       #   - task_key: ingest_from_rds_to_s3
