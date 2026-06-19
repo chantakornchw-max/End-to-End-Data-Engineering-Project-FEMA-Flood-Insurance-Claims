@@ -62,36 +62,6 @@ def cleaned_bronze_to_silver():
                 col("causeOfDamage").cast(StringType()).alias("cause_of_damage"),
                 col("nonPaymentReasonBuilding").cast(StringType()).alias("non_payment_reason_building")
             )
-                # col("id").alias("claim_id").cast(StringType()),
-                # col("floodEvent").alias("flood_event").cast(StringType()),
-                
-                # col("dateOfLoss").alias("date_of_loss").cast(TimestampType()),
-                # col("yearOfLoss").alias("year_of_loss").cast(DoubleType()).cast(IntegerType()),
-                # col("originalConstructionDate").alias("original_construction_date").cast(TimestampType()),
-                
-                # col("state").alias("state").cast(StringType()),
-                # col("reportedZipCode").alias("reported_zip_code").cast(StringType()), 
-                # col("latitude").alias("latitude").cast(DoubleType()),
-                # col("longitude").alias("longitude").cast(DoubleType()),
-                # col("ratedFloodZone").alias("rated_flood_zone").cast(StringType()),
-                
-                # col("occupancyType").alias("occupancy_type").cast(DoubleType()).cast(IntegerType()),
-                # col("primaryResidenceIndicator").alias("primary_residence_indicator").cast(DoubleType()).cast(IntegerType()),
-                # col("elevationDifference").alias("elevation_difference").cast(DoubleType()),
-                # col("waterDepth").alias("water_depth").cast(DoubleType()),
-                
-                # col("buildingPropertyValue").alias("building_property_value").cast(DoubleType()),
-                # col("totalBuildingInsuranceCoverage").alias("total_building_insurance_coverage").cast(DoubleType()),
-                # col("buildingDamageAmount").alias("building_damage_amount").cast(DoubleType()),
-                # col("buildingReplacementCost").alias("building_replacement_cost").cast(DoubleType()),
-                # col("netBuildingPaymentAmount").alias("net_building_payment_amount").cast(DoubleType()),
-                # col("totalContentsInsuranceCoverage").alias("total_contents_insurance_coverage").cast(DoubleType()),
-                # col("contentsDamageAmount").alias("contents_damage_amount").cast(DoubleType()),
-                # col("netContentsPaymentAmount").alias("net_contents_payment_amount").cast(DoubleType()),
-                
-                # col("buildingDeductibleCode").alias("building_deductible_code").cast(StringType()),
-                # col("causeOfDamage").alias("cause_of_damage").cast(StringType()),
-                # col("nonPaymentReasonBuilding").alias("non_payment_reason_building").cast(StringType())
 
             # Handling NULL values
             .dropna(subset=['claim_id', 'date_of_loss'])
