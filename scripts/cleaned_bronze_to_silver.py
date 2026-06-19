@@ -18,27 +18,9 @@ def cleaned_bronze_to_silver():
         .getOrCreate()
     )
 
-    # aws_access_key = sys.argv[1]
-    # aws_secret_key = sys.argv[2]
-    # spark.sparkContext._jsc.hadoopConfiguration().set("fs.s3a.access.key", aws_access_key)
-    # spark.sparkContext._jsc.hadoopConfiguration().set("fs.s3a.secret.key", aws_secret_key)
-    # spark.sparkContext._jsc.hadoopConfiguration().set("fs.s3a.endpoint", "s3.ap-southeast-1.amazonaws.com")
-
     bucket_name = sys.argv[3]
     bronze_input_path = f"s3://{bucket_name}/bronze/raw_data/"
     silver_output_path = f"s3://{bucket_name}/silver/cleaned_data/fact/" 
-
-
-    # aws_access_key = os.environ.get("AWS_ACCESS_KEY_ID")
-    # aws_secret_key = os.environ.get("AWS_SECRET_ACCESS_KEY")
-    # spark.conf.set("fs.s3a.access.key", aws_access_key)
-    # spark.conf.set("fs.s3a.secret.key", aws_secret_key)
-    # spark.conf.set("fs.s3a.endpoint", "s3.ap-southeast-1.amazonaws.com")
-
-
-    # bucket_name = os.environ.get("S3_BUCKET_NAME", "fema-flood-claims-bucket-2026")
-    # bronze_input_path = f"s3a://{bucket_name}/bronze/raw_data/"
-    # silver_output_path = f"s3a://{bucket_name}/silver/cleaned_data/fact/"
 
 
     try:
@@ -53,7 +35,7 @@ def cleaned_bronze_to_silver():
                 col("floodEvent").alias("flood_event").cast(StringType()),
                 
                 col("dateOfLoss").alias("date_of_loss").cast(TimestampType()),
-                col("yearOfLoss").alias("year_of_loss").cast(IntegerType()),
+                col("yearOfLoss").alias("year_of_loss").cast(DoubleType()).cast(IntegerType()),
                 col("originalConstructionDate").alias("original_construction_date").cast(TimestampType()),
                 
                 col("state").alias("state").cast(StringType()),
@@ -62,8 +44,8 @@ def cleaned_bronze_to_silver():
                 col("longitude").alias("longitude").cast(DoubleType()),
                 col("ratedFloodZone").alias("rated_flood_zone").cast(StringType()),
                 
-                col("occupancyType").alias("occupancy_type").cast(IntegerType()),
-                col("primaryResidenceIndicator").alias("primary_residence_indicator").cast(IntegerType()),
+                col("occupancyType").alias("occupancy_type").cast(DoubleType()).cast(IntegerType()),
+                col("primaryResidenceIndicator").alias("primary_residence_indicator").cast(DoubleType()).cast(IntegerType()),
                 col("elevationDifference").alias("elevation_difference").cast(DoubleType()),
                 col("waterDepth").alias("water_depth").cast(DoubleType()),
                 
