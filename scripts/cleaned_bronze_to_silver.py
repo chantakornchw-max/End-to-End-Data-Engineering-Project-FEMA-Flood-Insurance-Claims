@@ -29,39 +29,69 @@ def cleaned_bronze_to_silver():
         cleaned_df = (
             spark.read.parquet(bronze_input_path)
 
-            # Select columns, Rename, and Change type
+            # Select columns, Change type, and Rename
             .select(
-                col("id").alias("claim_id").cast(StringType()),
-                col("floodEvent").alias("flood_event").cast(StringType()),
+                col("id").cast(StringType()).alias("claim_id"),
+                col("floodEvent").cast(StringType()).alias("flood_event"),
                 
-                col("dateOfLoss").alias("date_of_loss").cast(TimestampType()),
-                col("yearOfLoss").alias("year_of_loss").cast(DoubleType()).cast(IntegerType()),
-                col("originalConstructionDate").alias("original_construction_date").cast(TimestampType()),
+                col("dateOfLoss").cast(TimestampType()).alias("date_of_loss"),
+                col("yearOfLoss").cast(DoubleType()).cast(IntegerType()).alias("year_of_loss"),
+                col("originalConstructionDate").cast(TimestampType()).alias("original_construction_date"),
                 
-                col("state").alias("state").cast(StringType()),
-                col("reportedZipCode").alias("reported_zip_code").cast(StringType()), 
-                col("latitude").alias("latitude").cast(DoubleType()),
-                col("longitude").alias("longitude").cast(DoubleType()),
-                col("ratedFloodZone").alias("rated_flood_zone").cast(StringType()),
+                col("state").cast(StringType()).alias("state"),
+                col("reportedZipCode").cast(StringType()).alias("reported_zip_code"), 
+                col("latitude").cast(DoubleType()).alias("latitude"),
+                col("longitude").cast(DoubleType()).alias("longitude"),
+                col("ratedFloodZone").cast(StringType()).alias("rated_flood_zone"),
                 
-                col("occupancyType").alias("occupancy_type").cast(DoubleType()).cast(IntegerType()),
-                col("primaryResidenceIndicator").alias("primary_residence_indicator").cast(DoubleType()).cast(IntegerType()),
-                col("elevationDifference").alias("elevation_difference").cast(DoubleType()),
-                col("waterDepth").alias("water_depth").cast(DoubleType()),
+                col("occupancyType").cast(DoubleType()).cast(IntegerType()).alias("occupancy_type"),
+                col("primaryResidenceIndicator").cast(DoubleType()).cast(IntegerType()).alias("primary_residence_indicator"),
+                col("elevationDifference").cast(DoubleType()).alias("elevation_difference"),
+                col("waterDepth").cast(DoubleType()).alias("water_depth"),
                 
-                col("buildingPropertyValue").alias("building_property_value").cast(DoubleType()),
-                col("totalBuildingInsuranceCoverage").alias("total_building_insurance_coverage").cast(DoubleType()),
-                col("buildingDamageAmount").alias("building_damage_amount").cast(DoubleType()),
-                col("buildingReplacementCost").alias("building_replacement_cost").cast(DoubleType()),
-                col("netBuildingPaymentAmount").alias("net_building_payment_amount").cast(DoubleType()),
-                col("totalContentsInsuranceCoverage").alias("total_contents_insurance_coverage").cast(DoubleType()),
-                col("contentsDamageAmount").alias("contents_damage_amount").cast(DoubleType()),
-                col("netContentsPaymentAmount").alias("net_contents_payment_amount").cast(DoubleType()),
+                col("buildingPropertyValue").cast(DoubleType()).alias("building_property_value"),
+                col("totalBuildingInsuranceCoverage").cast(DoubleType()).alias("total_building_insurance_coverage"),
+                col("buildingDamageAmount").cast(DoubleType()).alias("building_damage_amount"),
+                col("buildingReplacementCost").cast(DoubleType()).alias("building_replacement_cost"),
+                col("netBuildingPaymentAmount").cast(DoubleType()).alias("net_building_payment_amount"),
+                col("totalContentsInsuranceCoverage").cast(DoubleType()).alias("total_contents_insurance_coverage"),
+                col("contentsDamageAmount").cast(DoubleType()).alias("contents_damage_amount"),
+                col("netContentsPaymentAmount").cast(DoubleType()).alias("net_contents_payment_amount"),
                 
-                col("buildingDeductibleCode").alias("building_deductible_code").cast(StringType()),
-                col("causeOfDamage").alias("cause_of_damage").cast(StringType()),
-                col("nonPaymentReasonBuilding").alias("non_payment_reason_building").cast(StringType())
+                col("buildingDeductibleCode").cast(StringType()).alias("building_deductible_code"),
+                col("causeOfDamage").cast(StringType()).alias("cause_of_damage"),
+                col("nonPaymentReasonBuilding").cast(StringType()).alias("non_payment_reason_building")
             )
+                # col("id").alias("claim_id").cast(StringType()),
+                # col("floodEvent").alias("flood_event").cast(StringType()),
+                
+                # col("dateOfLoss").alias("date_of_loss").cast(TimestampType()),
+                # col("yearOfLoss").alias("year_of_loss").cast(DoubleType()).cast(IntegerType()),
+                # col("originalConstructionDate").alias("original_construction_date").cast(TimestampType()),
+                
+                # col("state").alias("state").cast(StringType()),
+                # col("reportedZipCode").alias("reported_zip_code").cast(StringType()), 
+                # col("latitude").alias("latitude").cast(DoubleType()),
+                # col("longitude").alias("longitude").cast(DoubleType()),
+                # col("ratedFloodZone").alias("rated_flood_zone").cast(StringType()),
+                
+                # col("occupancyType").alias("occupancy_type").cast(DoubleType()).cast(IntegerType()),
+                # col("primaryResidenceIndicator").alias("primary_residence_indicator").cast(DoubleType()).cast(IntegerType()),
+                # col("elevationDifference").alias("elevation_difference").cast(DoubleType()),
+                # col("waterDepth").alias("water_depth").cast(DoubleType()),
+                
+                # col("buildingPropertyValue").alias("building_property_value").cast(DoubleType()),
+                # col("totalBuildingInsuranceCoverage").alias("total_building_insurance_coverage").cast(DoubleType()),
+                # col("buildingDamageAmount").alias("building_damage_amount").cast(DoubleType()),
+                # col("buildingReplacementCost").alias("building_replacement_cost").cast(DoubleType()),
+                # col("netBuildingPaymentAmount").alias("net_building_payment_amount").cast(DoubleType()),
+                # col("totalContentsInsuranceCoverage").alias("total_contents_insurance_coverage").cast(DoubleType()),
+                # col("contentsDamageAmount").alias("contents_damage_amount").cast(DoubleType()),
+                # col("netContentsPaymentAmount").alias("net_contents_payment_amount").cast(DoubleType()),
+                
+                # col("buildingDeductibleCode").alias("building_deductible_code").cast(StringType()),
+                # col("causeOfDamage").alias("cause_of_damage").cast(StringType()),
+                # col("nonPaymentReasonBuilding").alias("non_payment_reason_building").cast(StringType())
 
             # Handling NULL values
             .dropna(subset=['claim_id', 'date_of_loss'])
