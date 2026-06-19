@@ -38,38 +38,19 @@ def ingest_from_rds_to_s3():
 
     aws_access_key = sys.argv[1]
     aws_secret_key = sys.argv[2]
-    # spark.sparkContext._jsc.hadoopConfiguration().set("fs.s3a.access.key", aws_access_key)
-    # spark.sparkContext._jsc.hadoopConfiguration().set("fs.s3a.secret.key", aws_secret_key)
-    # spark.sparkContext._jsc.hadoopConfiguration().set("fs.s3a.endpoint", "s3.ap-southeast-1.amazonaws.com")
-
-    # spark.conf.set("spark.hadoop.fs.s3a.access.key", aws_access_key)
-    # spark.conf.set("spark.hadoop.fs.s3a.secret.key", aws_secret_key)
-    # spark.conf.set("spark.hadoop.fs.s3a.endpoint", "s3.ap-southeast-1.amazonaws.com")
-
-    # spark.conf.set("fs.s3a.access.key", aws_access_key)
-    # spark.conf.set("fs.s3a.secret.key", aws_secret_key)
-    # spark.conf.set("fs.s3a.endpoint", "s3.ap-southeast-1.amazonaws.com") 
+    bucket_name = sys.argv[3]
 
     table_name = "public.raw_fema_claims"
-    bucket_name = sys.argv[3]
     bronze_output_path = f"s3://{bucket_name}/bronze/raw_data/"
 
     try:
 
         db_creds = get_db_credentials('fema/rds_credentials', aws_access_key, aws_secret_key)
 
-
         rds_endpoint = next(v for k, v in db_creds.items() if 'host' in k)
         db_user = next(v for k, v in db_creds.items() if 'user' in k)
         db_password = next(v for k, v in db_creds.items() if 'pass' in k)
 
-        # logging.info(f"==== SECRET KEYS WE GOT: {db_creds.keys()} ====")
-        # logging.info(f"==== SECRET CONTENT TYPE: {type(db_creds)} ====")
-    
-        # rds_endpoint = db_creds['host']
-        # db_user = db_creds['username']
-        # db_password = db_creds['password']
-        
         jdbc_url = f"jdbc:postgresql://{rds_endpoint}:5432/fema_flood_db"
         connection_properties = {
             "user": db_user, 

@@ -5,7 +5,6 @@ from pyspark.sql.functions import *
 from pyspark.sql.types import *
 
 
-
 def cleaned_bronze_to_silver():
 
     logging.basicConfig(
@@ -21,7 +20,6 @@ def cleaned_bronze_to_silver():
     bucket_name = sys.argv[3]
     bronze_input_path = f"s3://{bucket_name}/bronze/raw_data/"
     silver_output_path = f"s3://{bucket_name}/silver/cleaned_data/fact/" 
-
 
     try:
         logging.info("Starting clean process...")

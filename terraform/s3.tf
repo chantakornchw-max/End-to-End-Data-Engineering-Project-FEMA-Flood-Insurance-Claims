@@ -1,8 +1,9 @@
-
+# ==========================================
+# S3 Configurations
+# ==========================================
 resource "aws_s3_bucket" "fema_data_lake" {
   bucket = "fema-flood-claims-bucket-2026"
 
-  # คำสั่งไม้ตาย: อนุญาตให้ลบถังนี้ทิ้งได้ทันทีแม้ว่าจะมีไฟล์ค้างอยู่ข้างใน (เหมาะสำหรับโปรเจกต์ทดสอบ)
   force_destroy = true 
 
   tags = {
@@ -12,7 +13,9 @@ resource "aws_s3_bucket" "fema_data_lake" {
   }
 }
 
-
+# ==========================================
+# Blocking public access
+# ==========================================
 resource "aws_s3_bucket_public_access_block" "fema_data_lake_security" {
   bucket = aws_s3_bucket.fema_data_lake.id
 
@@ -21,4 +24,3 @@ resource "aws_s3_bucket_public_access_block" "fema_data_lake_security" {
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
-

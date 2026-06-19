@@ -2,6 +2,7 @@ import sys
 import logging
 from pyspark.sql import SparkSession
 
+
 def fact_silver_to_gold():
 
     logging.basicConfig(
@@ -14,27 +15,9 @@ def fact_silver_to_gold():
         .getOrCreate()
     )
 
-    # aws_access_key = sys.argv[1]
-    # aws_secret_key = sys.argv[2]
-    # spark.sparkContext._jsc.hadoopConfiguration().set("fs.s3a.access.key", aws_access_key)
-    # spark.sparkContext._jsc.hadoopConfiguration().set("fs.s3a.secret.key", aws_secret_key)
-    # spark.sparkContext._jsc.hadoopConfiguration().set("fs.s3a.endpoint", "s3.ap-southeast-1.amazonaws.com")
-
     bucket_name = sys.argv[3]
     silver_input_path = f"s3://{bucket_name}/silver/cleaned_data/fact/"
     gold_output_path = f"s3://{bucket_name}/gold/fact/"
-
-    # aws_access_key = os.environ.get("AWS_ACCESS_KEY_ID")
-    # aws_secret_key = os.environ.get("AWS_SECRET_ACCESS_KEY")
-    # spark.conf.set("fs.s3a.access.key", aws_access_key)
-    # spark.conf.set("fs.s3a.secret.key", aws_secret_key)
-    # spark.conf.set("fs.s3a.endpoint", "s3.ap-southeast-1.amazonaws.com")
-
-
-    # bucket_name = os.environ.get("S3_BUCKET_NAME", "fema-flood-claims-bucket-2026")
-    # silver_input_path = f"s3a://{bucket_name}/silver/cleaned_data/fact/"
-    # gold_output_path = f"s3a://{bucket_name}/gold/fact/"
-
 
     try:
         logging.info("Starting load Fact Table from Silver to Gold...")
@@ -61,4 +44,3 @@ def fact_silver_to_gold():
 
 if __name__ == "__main__":
     fact_silver_to_gold()
-
