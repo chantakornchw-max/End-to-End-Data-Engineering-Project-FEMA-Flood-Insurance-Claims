@@ -64,7 +64,7 @@ def fact_silver_to_gold():
                 col("total_net_payment"),
                 col("coverage_percentage"),
                 col("is_underinsured")
-                )
+            )
         )
 
         (gold_df
