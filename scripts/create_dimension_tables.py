@@ -23,7 +23,7 @@ def create_dimension_tables():
         logging.info("Starting create Dimension Tables...")
 
         # ==========================================
-        # Dimension 1: dim_occupancy
+        # Dimension 1: dim_occupancy_type
         # ==========================================
         occupancy_data = [
             (1, "Single Family Residence"),
@@ -54,10 +54,10 @@ def create_dimension_tables():
                 .write
                 .format("delta") 
                 .mode("overwrite")
-                .option("path", f"{gold_output_path}/dim_occupancy/")
-                .saveAsTable("default.gold_dim_occupancy") 
+                .option("path", f"{gold_output_path}/dim_occupancy_type/")
+                .saveAsTable("default.gold_dim_occupancy_type") 
         )
-        logging.info("Created and registered default.gold_dim_occupancy successfully")
+        logging.info("Created and registered default.gold_dim_occupancy_type successfully")
 
 
         # ==========================================
@@ -186,6 +186,32 @@ def create_dimension_tables():
                 .saveAsTable("default.gold_dim_non_payment_reason")
         )
         logging.info("Created and registered default.gold_dim_non_payment_reason successfully")
+
+
+        # ==========================================
+        # Dimension 6: dim_is_underinsured
+        # ==========================================
+        underinsured_data = [
+            (0, "Adequately Insured"),
+            (1, "Underinsured")
+        ]
+
+        underinsured_schema = StructType([
+            StructField("is_underinsured", IntegerType(), False),
+            StructField("insurance_coverage_status", StringType(), False)
+        ])
+
+        dim_underinsured_df = spark.createDataFrame(underinsured_data, underinsured_schema)
+
+        (dim_underinsured_df
+            .coalesce(1)
+            .write
+            .format("delta")
+            .mode("overwrite")
+            .option("path", f"{gold_output_path}/dim_is_underinsured/")
+            .saveAsTable("default.gold_dim_is_underinsured")
+        )
+        logging.info("Created and registered default.gold_dim_is_underinsured successfully")
 
 
     except Exception as e:
