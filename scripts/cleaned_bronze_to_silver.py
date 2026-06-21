@@ -37,7 +37,7 @@ def cleaned_bronze_to_silver():
                 col("originalConstructionDate").cast(TimestampType()).alias("original_construction_date"),
                 
                 col("state").cast(StringType()).alias("state"),
-                col("reportedZipCode").cast(StringType()).alias("reported_zip_code"), 
+                lpad(col("reportedZipCode").cast(IntegerType()).cast(StringType()), 5, "0").alias("reported_zip_code"), 
                 col("latitude").cast(DoubleType()).alias("latitude"),
                 col("longitude").cast(DoubleType()).alias("longitude"),
                 col("ratedFloodZone").cast(StringType()).alias("rated_flood_zone"),
