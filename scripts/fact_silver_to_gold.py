@@ -72,6 +72,7 @@ def fact_silver_to_gold():
             .format("delta") 
             .partitionBy("year_of_loss")
             .mode("overwrite")
+            .option("overwriteSchema", "true")
             .option("path", gold_output_path) 
             .saveAsTable("default.gold_fact_fema_claims") 
         )
