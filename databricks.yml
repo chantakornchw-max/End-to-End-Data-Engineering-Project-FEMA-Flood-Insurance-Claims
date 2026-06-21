@@ -25,7 +25,7 @@ resources:
       schedule:
         quartz_cron_expression: "0 0 14 * * ?" 
         timezone_id: "Asia/Bangkok"
-        pause_status: PAUSED
+        # pause_status: PAUSED
 
       environments:
         - environment_key: serverless_env
