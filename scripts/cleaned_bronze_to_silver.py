@@ -58,14 +58,11 @@ def cleaned_bronze_to_silver():
                 
                 col("buildingDeductibleCode").cast(StringType()).alias("building_deductible_code"),
                 col("causeOfDamage").cast(StringType()).alias("cause_of_damage"),
-
                 when(col("nonPaymentReasonBuilding").cast(StringType()).rlike(r"^\d+(\.0)?$"), 
                     lpad(split(col("nonPaymentReasonBuilding").cast(StringType()), r"\.")[0], 2, "0")
                 )
                 .otherwise(col("nonPaymentReasonBuilding").cast(StringType()))
-                .alias("non_payment_reason_building"),
-
-                col("nonPaymentReasonBuilding").cast(StringType()).alias("non_payment_reason_building")
+                .alias("non_payment_reason_building")
             )
 
             # Handling NULL values
