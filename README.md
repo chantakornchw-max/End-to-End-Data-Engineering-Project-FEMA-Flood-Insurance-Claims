@@ -78,7 +78,7 @@ To demonstrate the pipeline's capability in handling large-scale, real-world dis
 | **Data Modeling (Gold - Dim)** | [`create_dimension_tables.py`](./scripts/create_dimension_tables.py) | Constructs dimension tables by mapping raw integer codes to meaningful text descriptions based on the official FEMA Data Dictionary (e.g., Occupancy Type) to complete the Star Schema. |
 
 
-### Data Quality 
+## Data Quality 
 
 To ensure data reliability and maintain a single source of truth, data quality rules were embedded directly into the PySpark transformation logic, while code and infrastructure stability were guaranteed through a robust GitHub Actions pipeline.
 
@@ -92,7 +92,65 @@ To ensure data reliability and maintain a single source of truth, data quality r
   * **Deduplication:** Applied `.dropDuplicates(["claim_id"])` to guarantee transaction uniqueness before partitioning the data by `year_of_loss` to optimize downstream performance.
 
 
-  ### Data Modeling
 
+## Data Visualization
 
-  ## Data Visualization
+### Data Modeling
+![Data Modeling](./images/Data_Modeling.png)
+
+#### Star Schema
+
+To ensure high performance and flexible analysis, I implemented a **Star Schema** model within Power BI. This structure separates business metrics (Facts) from descriptive attributes (Dimensions), optimizing the model for the massive FEMA dataset.
+
+ * **Fact Table:** The core metrics and foreign keys are consolidated into a single fact table: `gold_fact_fema_claims`.
+
+ * **Dimension Tables:** Descriptive attributes are split into specialized dimensions (e.g., `gold_dim_non_payment_reason`, `gold_dim_cause_of_damage`, `gold_dim_occupancy_type`, and a custom `dim_date`) to provide precise filtering context.
+
+#### Custom Date Dimension
+
+I used **DAX** to create a dynamic custom `dim_date`  table instead of relying on the default system calendar. This ensures the date range automatically adapts to the minimum and maximum loss dates in the fact table, allowing for accurate time intelligence analysis.
+
+``` M
+dim_date = 
+VAR startYear = YEAR(MIN('gold_fact_fema_claims'[date_of_loss]))
+VAR endYear = YEAR(MAX('gold_fact_fema_claims'[date_of_loss]))
+RETURN
+ADDCOLUMNS(
+    CALENDAR(
+        DATE(startYear, 1, 1),
+        DATE(endYear, 12, 31)
+    ),
+    "Year", YEAR([Date]),
+    "Quarter", "Q" & FORMAT([Date], "q"),
+    "QuarterID", QUARTER([Date]),
+    "Month", FORMAT([Date], "mmm"),
+    "MonthID", MONTH([Date]),
+    "MonthYear", FORMAT([Date], "mmm yyyy"),
+    "MonthYearID", INT(FORMAT([Date], "yyyymm")),
+    "QuarterYear", "Q" & FORMAT([Date], "q yyyy"),
+    "QuarterYearID", INT(FORMAT([Date], "yyyyq")),
+    "Days of Week", FORMAT([Date], "ddd"),
+    "DayOfWeekID", WEEKDAY([Date], 1)
+)
+```
+
+#### Measures
+
+To drive the dashboard's analytics, I created a set of foundational measures using DAX. These metrics power the KPI cards and all aggregations across the reports:
+
+* `Total Claims` : Calculates the total volume of submitted claims.
+
+* `Total Damage Amount` : Aggregates the assessed value of property and contents damage.
+
+* `Total Net Payment` : Aggregates the actual compensation paid to policyholders.
+
+To uncover deeper business insights, I developed a custom metric called `Coverage Gap Amount`, which highlights the financial risk and the deficit between the physical damage and the actual payout.
+
+``` M
+Coverage Gap Amount = 
+VAR TotalDamage = SUM('gold_fact_fema_claims'[total_damage_amount]) 
+VAR TotalPayment = SUM('gold_fact_fema_claims'[total_net_payment]) 
+
+RETURN
+TotalDamage - TotalPayment
+```
