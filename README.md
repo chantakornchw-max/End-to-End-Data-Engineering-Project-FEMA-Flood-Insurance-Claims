@@ -2,27 +2,36 @@
 
 **⚠️ Work in Progress ⚠️** 
 
+
+## Table of Contents
+
+* [Business Case](#business-case)
+* [Pipeline Architecture](#pipeline-architecture)
+    * [Tech Stacks](#tech-stacks)
+    * [Data Pipeline Flow](#data-pipeline-flow)
+    * [Source Code Map](#source-code-map)
+* [Data Quality](#data-quality)
+* [Data Visualization](#data-visualization)
+	* [Data Modeling](#data-modeling)
+    * [Executive Overview](#executive-overview)
+    * [Geospatial & Risk Analysis](#geospatial--risk-analysis)
+    * [Operational & Claim Rejection Analysis](#operational--claim-rejection-analysis)
+<!-- * [Challenges](#challenges)
+* [Setup Instructions](#setup-instructions) -->
+
+
 ## Business Case
 
-...
+In the property and casualty insurance industry, accurate risk assessment is the primary defense against catastrophic financial losses. For stakeholders and underwriting teams, managing flood risks requires more than just high-level observation; it demands highly granular, automated, and actionable intelligence. Stakeholders within the risk management, actuarial, and claims operations teams rely on this pipeline for:
 
-<!-- In the face of increasing climate volatility and extreme weather events, understanding the financial impact of floods is critical. For risk management teams, government agencies, and insurance providers, reactive analysis is no longer sufficient; it demands a proactive, scalable, and automated data intelligence pipeline. Stakeholders within the risk analytics and strategic planning teams rely on this pipeline for:
+* **Optimizing** premium pricing models based on precise physical risk factors, such as property elevation and flood zone vulnerabilities.
 
-* Assessing geographical flood risks to optimize insurance premium strategies and resource allocation.
-* Analyzing historical disaster trends and identifying the financial impact of severe weather events (e.g., major hurricanes).
-* Evaluating the "Coverage Gap" by comparing actual property damage against net insurance payouts, and analyzing reasons for claim denials to improve future policy offerings.
-* Replacing manual database extractions with a robust automated Lakehouse pipeline, allowing the team to focus on actionable insights rather than complex data wrangling. -->
+* **Analyzing** geographic risk exposure to pinpoint vulnerability hotspots and proactively manage policy capacity in high-risk areas.
 
-<!-- ### Project Scope
+* **Identifying** systemic underinsurance behaviors across specific property portfolios to uncover targeted cross-selling and upselling opportunities.
 
-To demonstrate the pipeline's capability in handling large-scale, real-world disaster records, the current scope is focused on the National Flood Insurance Program (NFIP) claims data. The system tracks and models the following key dimensions:
+* **Replacing** fragmented, manual data wrangling with a robust automated pipeline, allowing the team to focus on mitigating claim rejections and refining policy strategies rather than data collection.
 
-* **Geospatial Risk:** States, precise coordinates (Latitude/Longitude), and rated flood zones.
-* **Financial Impact:** Building property values, total damage amounts, and net payment amounts.
-* **Claim Diagnostics:** Core causes of damage and specific non-payment reasons.
-* **Property Characteristics:** Occupancy types and building elevation differences.
-
-*Data represents historical redacted claims to protect PII (Personally Identifiable Information).* -->
 
 **Data Source:** [OpenFEMA Dataset](https://www.fema.gov/openfema-data-page/fima-nfip-redacted-claims-v2)
 
@@ -41,7 +50,7 @@ To demonstrate the pipeline's capability in handling large-scale, real-world dis
 
 * **Amazon S3:** Acts as the project's scalable Data Lake, providing highly durable object storage for landing raw data and storing processed data across the Medallion Architecture layers.
 
-* **Databricks:** The unified Lakehouse platform serving as the core execution environment. It manages the Delta Lake storage format and orchestrates the end-to-end workflow via **Databricks Jobs**.
+* **Databricks:** The unified Lakehouse platform serving as the core execution environment. It manages the **Delta Lake** storage format and orchestrates the end-to-end workflow via **Databricks Jobs**.
 
 * **Apache Spark (PySpark):** The distributed data processing engine utilized within Databricks to extract, clean, transform, and logically model large-scale datasets efficiently.
 
@@ -60,9 +69,9 @@ To demonstrate the pipeline's capability in handling large-scale, real-world dis
   
   * **Cleaned Data (Silver):** Involves data cleansing, column standardization, explicit data type casting, handling missing values, correcting anomalous negative financial metrics, and deduplication to create a reliable foundation.
   
-  * **Business-level Data (Gold):** The final analytical layer where data is logically modeled into a highly optimized **Star Schema** (1 Fact, 5 Dimension tables). This data is saved in **Delta** format and strategically partitioned, making it ready for downstream consumption.
+  * **Business-level Data (Gold):** The final analytical layer where data is logically modeled into a highly optimized **Star Schema** (1 Fact, 7 Dimension tables). This data is saved in **Delta** format and strategically partitioned, making it ready for downstream consumption.
 
-* **Load:** The transformed Gold tables are registered in the Databricks Hive Metastore and exposed via **Databricks SQL Warehouse**, serving as a high-performance querying endpoint for **Power BI** visualization.
+* **Load:** The transformed Gold tables are registered in the **Databricks Unity Catalog** and exposed via **Databricks SQL Warehouse**, serving as a high-performance querying endpoint for **Power BI** visualization.
 
 
 ### Source Code Map
@@ -154,3 +163,43 @@ VAR TotalPayment = SUM('gold_fact_fema_claims'[total_net_payment])
 RETURN
 TotalDamage - TotalPayment
 ```
+
+### Executive Overview
+
+This page serves as the control center for C-level executives, providing an immediate snapshot of the company's financial exposure and historical claim trends.
+
+![Executive Overview](./images/Executive_Overview.png)
+
+  - **Key Performance Indicators (KPIs):** Instantly highlights the massive scale of the data, processing 2.72M total claims with a staggering $103.40bn in total damage. The $14.84bn Coverage Gap immediately reveals the uninsured loss burden.
+
+  - **Financial Impact & Historical Claim Volume:** Clearly identifies the 2005 hurricane season (driven largely by Hurricane Katrina's $20.1bn damage) as the most catastrophic event in the dataset.
+
+  - **Geographical Claim Distribution:** A state-level bubble map visualizes the concentration of claims along the East Coast and the Gulf of Mexico, aiding in high-level capital allocation.
+
+
+### Geospatial & Risk Analysis
+
+This page shifts the focus to the underwriting and risk management teams, leveraging physical attributes and precise geospatial data to challenge existing risk models.
+
+![Geospatial & Risk Analysis](./images/Geospatial_Risk_Analysis.png)
+
+  - **Precision Vulnerability Hotspots (Lat/Long):** By utilizing the cleansed coordinate data instead of zip codes, this map pinpoints exact vulnerability hotspots down to the property level, moving beyond generalized state-level risks.
+
+  - **Physical Risk Correlation (Elevation vs. Damage):** This powerful scatter plot proves the physical risk theory. It forms a clear "bell curve," demonstrating that properties built precisely at sea level (0 elevation difference) suffer exponentially higher damage amounts.
+
+  - **Risk Exposure by FEMA Flood Zone:** While high-risk Zone AE accounts for the majority of damage, a crucial insight is that a significant portion of damage occurs in Zone X (traditionally considered a low-to-moderate risk area), signaling a critical need to update internal flood risk models.
+
+  - **Underinsurance Risk by Property Type:** Cross-analyzes occupancy types against insurance coverage status, highlighting portfolios where policyholders are underinsured, which opens up targeted cross-selling opportunities.
+
+
+### Operational & Claim Rejection Analysis
+
+Designed for the claims and operations teams, this page investigates the root causes of denied payouts and provides actionable case-level data.
+
+![Operational & Claim Rejection Analysis](./images/Operational_Claim_Rejection_Analysis.png)
+
+  - **Claim Rejection Root Causes:** By filtering out successful payouts, this chart exposes the primary reasons claims are denied (e.g., Damage less than deductible, Not actual flood). This insight is vital for refining policy wording and improving customer communication.
+
+  - **Customer Risk Appetite (Deductible Choice):** Analyzes customer risk behavior by showing the most common deductible tiers chosen by policyholders (predominantly the $500 and $1,000 tiers).
+
+  - **Operational Claim Records:** An interactive, granular matrix table that responds to cross-filtering from the charts above. It allows operational staff to drill down into specific claim IDs, storm events, and financial deficits, ready to be exported for further Excel analysis.
