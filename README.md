@@ -1,6 +1,6 @@
 # End-to-End Data Engineering Project: FEMA Flood Insurance Claims
 
-**⚠️ Work in Progress ⚠️** 
+<!-- **⚠️ Work in Progress ⚠️**  -->
 
 
 ## Table of Contents
@@ -37,7 +37,7 @@ In the property and casualty insurance industry, accurate risk assessment is the
 
 
 ## Pipeline Architecture
-![Pipeline Architecture](./images/Pipeline_Architecture2.png)
+![Pipeline Architecture](./images/Pipeline_Architecture.png)
 
 
 ### Tech Stacks
