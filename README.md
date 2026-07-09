@@ -37,7 +37,7 @@ In the property and casualty insurance industry, accurate risk assessment is the
 
 
 ## Pipeline Architecture
-![Pipeline Architecture](./images/Pipeline_Architecture.png)
+![Pipeline Architecture](./images/pipeline_architecture.png?raw=true)
 
 
 ### Tech Stacks
@@ -105,7 +105,7 @@ To ensure data reliability and maintain a single source of truth, data quality r
 ## Data Visualization
 
 ### Data Modeling
-![Data Modeling](./images/Data_Modeling.png)
+![Data Modeling](./images/data_modeling.png?raw=true)
 
 #### Star Schema
 
@@ -168,7 +168,7 @@ TotalDamage - TotalPayment
 
 This page serves as the control center for C-level executives, providing an immediate snapshot of the company's financial exposure and historical claim trends.
 
-![Executive Overview](./images/Executive_Overview.png)
+![Executive Overview](./images/executive_overview.png?raw=true)
 
   - **Key Performance Indicators (KPIs):** Instantly highlights the massive scale of the data, processing 2.72M total claims with a staggering $103.40bn in total damage. The $14.84bn Coverage Gap immediately reveals the uninsured loss burden.
 
@@ -181,7 +181,7 @@ This page serves as the control center for C-level executives, providing an imme
 
 This page shifts the focus to the underwriting and risk management teams, leveraging physical attributes and precise geospatial data to challenge existing risk models.
 
-![Geospatial & Risk Analysis](./images/Geospatial_Risk_Analysis.png)
+![Geospatial & Risk Analysis](./images/geospatial_risk_analysis.png?raw=true)
 
   - **Precision Vulnerability Hotspots (Lat/Long):** By utilizing the cleansed coordinate data instead of zip codes, this map pinpoints exact vulnerability hotspots down to the property level, moving beyond generalized state-level risks.
 
@@ -196,7 +196,7 @@ This page shifts the focus to the underwriting and risk management teams, levera
 
 Designed for the claims and operations teams, this page investigates the root causes of denied payouts and provides actionable case-level data.
 
-![Operational & Claim Rejection Analysis](./images/Operational_Claim_Rejection_Analysis.png)
+![Operational & Claim Rejection Analysis](./images/operational_claim_rejection_analysis.png?raw=true)
 
   - **Claim Rejection Root Causes:** By filtering out successful payouts, this chart exposes the primary reasons claims are denied (e.g., Damage less than deductible, Not actual flood). This insight is vital for refining policy wording and improving customer communication.
 
